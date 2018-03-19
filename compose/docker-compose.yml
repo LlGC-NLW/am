@@ -66,7 +66,7 @@ services:
       - "4730"
     ports:
       - "62004:4730"
-    links:
+    depends_on:
       - "redis"
 
   fits:
@@ -104,7 +104,14 @@ services:
     build:
       context: "../src/archivematica/src"
       dockerfile: "MCPServer.Dockerfile"
+      args:
+        http_proxy: "http://cache.llgc.org.uk:80"
+        https_proxy: "http://cache.llgc.org.uk:80"
+        HTTP_PROXY: "http://cache.llgc.org.uk:80"
+        HTTPS_PROXY: "http://cache.llgc.org.uk:80"
+        no_proxy: "mysql,gearmand"
     environment:
+      no_proxy: "mysql"
       DJANGO_SECRET_KEY: "12345"
       DJANGO_SETTINGS_MODULE: "settings.common"
       ARCHIVEMATICA_MCPSERVER_CLIENT_USER: "archivematica"
@@ -118,7 +125,7 @@ services:
       - "../src/archivematica/src/dashboard/:/src/dashboard/"
       - "../src/archivematica/src/MCPServer/:/src/MCPServer/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    links:
+    depends_on:
       - "mysql"
       - "gearmand"
 
@@ -126,7 +133,14 @@ services:
     build:
       context: "../src/archivematica/src"
       dockerfile: "MCPClient.Dockerfile"
+      args:
+        http_proxy: "http://cache.llgc.org.uk:80"
+        https_proxy: "http://cache.llgc.org.uk:80"
+        HTTP_PROXY: "http://cache.llgc.org.uk:80"
+        HTTPS_PROXY: "http://cache.llgc.org.uk:80"
+        no_proxy: "archivematica-storage-service,fits,clamav,mysql,gearmand,elasticsearch"
     environment:
+      no_proxy: "mysql"
       DJANGO_SECRET_KEY: "12345"
       DJANGO_SETTINGS_MODULE: "settings.common"
       NAILGUN_SERVER: "fits"
@@ -145,7 +159,7 @@ services:
       - "../src/archivematica/src/dashboard/:/src/dashboard/"
       - "../src/archivematica/src/MCPClient/:/src/MCPClient/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    links:
+    depends_on:
       - "fits"
       - "clamavd"
       - "mysql"
@@ -157,7 +171,18 @@ services:
     build:
       context: "../src/archivematica/src"
       dockerfile: "dashboard.Dockerfile"
+      args:
+        http_proxy: "http://cache.llgc.org.uk:80"
+        https_proxy: "http://cache.llgc.org.uk:80"
+        HTTP_PROXY: "http://cache.llgc.org.uk:80"
+        HTTPS_PROXY: "http://cache.llgc.org.uk:80"
+        no_proxy: "archivematica-storage-service,mysql,gearmand,elasticsearch"
     environment:
+      http_proxy: "http://cache.llgc.org.uk:80"
+      https_proxy: "http://cache.llgc.org.uk:80"
+      HTTP_PROXY: "http://cache.llgc.org.uk:80"
+      HTTPS_PROXY: "http://cache.llgc.org.uk:80"
+      no_proxy: "archivematica-storage-service,mysql,gearmand,elasticsearch"
       FORWARDED_ALLOW_IPS: "*"
       AM_GUNICORN_ACCESSLOG: "/dev/null"
       AM_GUNICORN_RELOAD: "true"
@@ -176,7 +201,7 @@ services:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     expose:
       - "8000"
-    links:
+    depends_on:
       - "mysql"
       - "gearmand"
       - "elasticsearch"
@@ -185,7 +210,14 @@ services:
   archivematica-storage-service:
     build:
       context: "../src/archivematica-storage-service"
+      args:
+        http_proxy: "http://cache.llgc.org.uk:80"
+        https_proxy: "http://cache.llgc.org.uk:80"
+        HTTP_PROXY: "http://cache.llgc.org.uk:80"
+        HTTPS_PROXY: "http://cache.llgc.org.uk:80"
+        no_proxy: "mysql"
     environment:
+      no_proxy: "mysql"
       FORWARDED_ALLOW_IPS: "*"
       SS_GUNICORN_ACCESSLOG: "/dev/null"
       SS_GUNICORN_RELOAD: "true"
@@ -201,5 +233,5 @@ services:
       - "archivematica_storage_service_location_data:/home:rw"
     expose:
       - "8000"
-    links:
+    depends_on:
       - "mysql"

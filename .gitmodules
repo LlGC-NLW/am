@@ -1,6 +1,6 @@
 [submodule "archivematica"]
 	path = src/archivematica
-	url = https://github.com/artefactual/archivematica
+	url = https://github.com/LlGC-NLW/archivematica
 	branch = qa/1.x
 [submodule "archivematica-storage-service"]
 	path = src/archivematica-storage-service
